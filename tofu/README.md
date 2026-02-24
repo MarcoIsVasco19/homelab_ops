@@ -42,6 +42,18 @@ tofu apply
 - Per-node cloud-init files are rendered into `cloud-init/rendered/` by `scripts/render-cloud-init.sh`.
 - Renderer reads SSH key from `SSH_PUBLIC_KEY` or `SSH_PUB_KEY_FILE` (defaults to `~/.ssh/id_ed25519.pub`).
 
+## Environment variables
+
+Set these in `.envrc.local`:
+
+- `TF_VAR_proxmox_api_token` (required)
+- `TF_VAR_proxmox_endpoint` (optional override)
+- `AWS_PROFILE` or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` (+ optional `AWS_SESSION_TOKEN`)
+- `AWS_REGION` (defaults to `eu-central-1` via `.envrc`)
+- `SSH_PUB_KEY_FILE` or `SSH_PUBLIC_KEY` for cloud-init rendering
+
+For full details, see [../README.md](../README.md).
+
 ## Configure S3 backend
 
 ```bash
