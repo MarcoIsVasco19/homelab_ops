@@ -1,0 +1,22 @@
+{
+  "ignition": { "version": "3.4.0" },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIctgwbl2oQ1lMqeSwxLm4NcDRGr3PS258y6zVmLkJnK"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/hostname",
+        "mode": 420,
+        "contents": { "source": "data:,k8s-cp-01" }
+      }
+    ]
+  }
+}
