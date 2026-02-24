@@ -36,6 +36,8 @@ override.tf.json
 backend.hcl
 .envrc.local
 .direnv/
+tofu/cloud-init/rendered/*.yaml
+tofu/cloud-init/rendered/*.yml
 
 # Ignore CLI configuration files
 .terraformrc

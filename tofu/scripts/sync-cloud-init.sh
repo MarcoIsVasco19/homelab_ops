@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SRC_DIR="${SRC_DIR:-./cloud-init}"
+SRC_DIR="${SRC_DIR:-./cloud-init/rendered}"
 PVE_HOST="${PVE_HOST:-}"
 PVE_USER="${PVE_USER:-root}"
 DEST_DIR="${DEST_DIR:-/var/lib/vz/snippets}"
+RENDER_FIRST="${RENDER_FIRST:-false}"
 
 usage() {
   cat <<USAGE
-Usage: $(basename "$0") --host <proxmox-host-or-ip> [--user root] [--src ./cloud-init] [--dest /var/lib/vz/snippets]
+Usage: $(basename "$0") --host <proxmox-host-or-ip> [--user root] [--src ./cloud-init/rendered] [--dest /var/lib/vz/snippets] [--render]
 
 Env alternatives:
-  PVE_HOST, PVE_USER, SRC_DIR, DEST_DIR
+  PVE_HOST, PVE_USER, SRC_DIR, DEST_DIR, RENDER_FIRST
 USAGE
 }
 
@@ -21,6 +22,7 @@ while [[ $# -gt 0 ]]; do
     --user) PVE_USER="$2"; shift 2 ;;
     --src) SRC_DIR="$2"; shift 2 ;;
     --dest) DEST_DIR="$2"; shift 2 ;;
+    --render) RENDER_FIRST=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown arg: $1" >&2; usage; exit 1 ;;
   esac
@@ -30,6 +32,10 @@ if [[ -z "$PVE_HOST" ]]; then
   echo "PVE host is required." >&2
   usage
   exit 1
+fi
+
+if [[ "$RENDER_FIRST" == "true" ]]; then
+  ./scripts/render-cloud-init.sh --out-dir "$SRC_DIR"
 fi
 
 if [[ ! -d "$SRC_DIR" ]]; then

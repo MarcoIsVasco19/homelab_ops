@@ -1,11 +1,11 @@
 #cloud-config
-hostname: k8s-wkr-02
+hostname: __HOSTNAME__
 manage_etc_hosts: true
 
 users:
   - name: root
     ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIctgwbl2oQ1lMqeSwxLm4NcDRGr3PS258y6zVmLkJnK
+      - __SSH_PUBLIC_KEY__
 
 write_files:
   - path: /etc/sysctl.d/99-kubernetes.conf

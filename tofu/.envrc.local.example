@@ -12,3 +12,7 @@ export AWS_PROFILE='default'
 # export AWS_ACCESS_KEY_ID='REPLACE_ME'
 # export AWS_SECRET_ACCESS_KEY='REPLACE_ME'
 # export AWS_SESSION_TOKEN='REPLACE_ME'
+
+# Cloud-init rendering
+# export SSH_PUB_KEY_FILE="$HOME/.ssh/id_ed25519.pub"
+# export SSH_PUBLIC_KEY='ssh-ed25519 AAAA...'

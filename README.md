@@ -14,8 +14,10 @@ Current default target:
 
 - `tofu/` OpenTofu root module
 - `tofu/modules/suseleap_micro_vm/` VM module (cloud-init based)
-- `tofu/cloud-init/` cloud-init user-data source files (tracked in git)
-- `tofu/scripts/sync-cloud-init.sh` sync helper to upload cloud-init files to Proxmox snippets storage
+- `tofu/cloud-init/templates/` cloud-init template source files
+- `tofu/cloud-init/rendered/` generated per-node cloud-init files
+- `tofu/scripts/render-cloud-init.sh` renders per-node cloud-init files from template + `nodes.auto.tfvars`
+- `tofu/scripts/sync-cloud-init.sh` sync helper to upload rendered files to Proxmox snippets storage
 - `tofu/nodes.auto.tfvars` environment-specific VM definitions
 
 ## Prerequisites
@@ -45,15 +47,16 @@ AWS credentials/profile in `.envrc.local` are used for the S3 backend.
 
 1. Edit VM settings in `tofu/nodes.auto.tfvars`
 2. Set `base_image_import_from` to your imported qcow2 file ID
-3. Update `tofu/cloud-init/k8s-cp-01-userdata.yaml` with your SSH public key
-4. Sync cloud-init files to Proxmox snippets:
+3. Render + sync cloud-init files to Proxmox snippets:
 
 ```bash
 cd tofu
-./scripts/sync-cloud-init.sh --host 1.2.3.4
+./scripts/sync-cloud-init.sh --host 1.2.3.4 --render
 ```
 
-5. Ensure each node’s `user_data_file_id` in `nodes.auto.tfvars` matches uploaded snippet file names (for datastore `local`, format is `local:snippets/<file>.yaml`)
+`render-cloud-init.sh` reads SSH key from `SSH_PUBLIC_KEY` or `SSH_PUB_KEY_FILE` (default `~/.ssh/id_ed25519.pub`).
+
+4. Ensure each node’s `user_data_file_id` in `nodes.auto.tfvars` matches uploaded snippet file names (for datastore `local`, format is `local:snippets/<file>.yaml`)
 
 ## Deploy
 
@@ -87,7 +90,7 @@ After migration, state is stored in S3 at the configured `bucket` + `key`.
 
 ```bash
 cd tofu
-./scripts/sync-cloud-init.sh --host 1.2.3.4
+./scripts/sync-cloud-init.sh --host 1.2.3.4 --render
 ```
 
 - Add another VM:
