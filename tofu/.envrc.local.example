@@ -1,0 +1,14 @@
+# Copy to .envrc.local and set real values.
+# This file should not be committed.
+
+# Proxmox
+export TF_VAR_proxmox_api_token='root@pam!tofu=REPLACE_ME'
+# Optional if not set in nodes.auto.tfvars:
+# export TF_VAR_proxmox_endpoint='https://192.168.2.69:8006/'
+
+# AWS credentials for S3 backend
+# Use either AWS_PROFILE or static keys.
+export AWS_PROFILE='default'
+# export AWS_ACCESS_KEY_ID='REPLACE_ME'
+# export AWS_SECRET_ACCESS_KEY='REPLACE_ME'
+# export AWS_SESSION_TOKEN='REPLACE_ME'

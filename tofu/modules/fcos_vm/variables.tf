@@ -31,12 +31,12 @@ variable "snippets_abs_path" {
 variable "nodes" {
   description = "Map of nodes to create."
   type = map(object({
-    vm_id         = number
-    hostname      = string
-    cores         = number
-    memory_mb     = number
-    disk_gb       = optional(number, 20)
-    tags          = optional(list(string), [])
-    ignition_path = string # path to a .ign file on your local machine
+    vm_id              = number
+    hostname           = string
+    cores              = number
+    memory_mb          = number
+    disk_gb            = optional(number, 20)
+    tags               = optional(list(string), [])
+    ignition_file_name = string # e.g. k8s-cp-01.ign
   }))
 }

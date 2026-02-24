@@ -37,6 +37,9 @@ resource "proxmox_virtual_environment_vm" "vm" {
     import_from = var.base_image_import_from
   }
 
-  # FCOS ignition via QEMU fw_cfg, referencing pre-staged snippet on the node
-  kvm_arguments = "-fw_cfg name=opt/com.coreos/config,file=${var.snippets_abs_path}/${each.value.ignition_file_name}"
+  # Cloud-init userdata file is pre-staged in snippets datastore
+  initialization {
+    datastore_id      = var.snippets_datastore_id
+    user_data_file_id = each.value.user_data_file_id
+  }
 }
