@@ -1,0 +1,22 @@
+---
+- name: Register cluster in Rancher via import manifest URL
+  ansible.builtin.command:
+    cmd: "/var/lib/rancher/rke2/bin/kubectl apply -f {{ rancher_import_manifest_url }}"
+  when: rancher_import_manifest_url | length > 0
+  environment:
+    KUBECONFIG: "{{ rke2_kubeconfig }}"
+
+- name: Register cluster in Rancher via full registration command
+  ansible.builtin.shell: "{{ rancher_registration_command }}"
+  when:
+    - rancher_import_manifest_url | length == 0
+    - rancher_registration_command | length > 0
+  environment:
+    KUBECONFIG: "{{ rke2_kubeconfig }}"
+
+- name: Warn when Rancher registration inputs are empty
+  ansible.builtin.debug:
+    msg: "Skipping Rancher registration. Set rancher_import_manifest_url or rancher_registration_command."
+  when:
+    - rancher_import_manifest_url | length == 0
+    - rancher_registration_command | length == 0

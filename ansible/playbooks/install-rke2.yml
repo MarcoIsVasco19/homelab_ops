@@ -1,0 +1,21 @@
+---
+- name: Install and configure bootstrap RKE2 server
+  hosts: k8s_cp_bootstrap
+  become: true
+  gather_facts: true
+  roles:
+    - rke2_server
+
+- name: Install and configure additional RKE2 servers
+  hosts: k8s_control_plane:!k8s_cp_bootstrap
+  become: true
+  gather_facts: true
+  roles:
+    - rke2_server
+
+- name: Install and configure RKE2 agents
+  hosts: k8s_workers
+  become: true
+  gather_facts: true
+  roles:
+    - rke2_agent

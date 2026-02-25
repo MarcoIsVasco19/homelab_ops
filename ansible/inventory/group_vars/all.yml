@@ -1,0 +1,24 @@
+# RKE2 settings
+rke2_version: "v1.35.1+rke2r1"
+rke2_token: "ENTER_RKE2_TOKEN_HERE"
+rke2_server_url: "https://{{ hostvars[groups['k8s_control_plane'][0]].ansible_host }}:9345"
+rke2_config_dir: "/etc/rancher/rke2"
+rke2_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
+rke2_write_kubeconfig_mode: "0644"
+
+# Networking
+rke2_cni: "cilium"
+rke2_cluster_cidr: "10.42.0.0/16"
+rke2_service_cidr: "10.43.0.0/16"
+rke2_cluster_dns: "10.43.0.10"
+rke2_disable_kube_proxy: false
+rke2_enable_hubble: true
+
+# Optional extra TLS SANs for API server cert
+rke2_tls_sans: []
+
+# Rancher registration
+# Verify your endpoint format (likely sslip.io, not sslip.op)
+rancher_server_url: "https://192.168.2.18.sslip.io"
+rancher_import_manifest_url: ""
+rancher_registration_command: ""

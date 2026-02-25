@@ -1,0 +1,46 @@
+---
+- name: Write Cilium HelmChartConfig with Hubble enabled
+  ansible.builtin.copy:
+    dest: /var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml
+    mode: "0644"
+    content: |
+      apiVersion: helm.cattle.io/v1
+      kind: HelmChartConfig
+      metadata:
+        name: rke2-cilium
+        namespace: kube-system
+      spec:
+        valuesContent: |-
+          hubble:
+            enabled: {{ rke2_enable_hubble | lower }}
+            relay:
+              enabled: {{ rke2_enable_hubble | lower }}
+            ui:
+              enabled: {{ rke2_enable_hubble | lower }}
+
+- name: Write ingress-nginx HelmChartConfig
+  ansible.builtin.copy:
+    dest: /var/lib/rancher/rke2/server/manifests/rke2-ingress-nginx-config.yaml
+    mode: "0644"
+    content: |
+      apiVersion: helm.cattle.io/v1
+      kind: HelmChartConfig
+      metadata:
+        name: rke2-ingress-nginx
+        namespace: kube-system
+      spec:
+        valuesContent: |-
+          controller:
+            replicaCount: 2
+
+- name: Wait until all cluster nodes are Ready
+  ansible.builtin.shell: |
+    set -o pipefail
+    /var/lib/rancher/rke2/bin/kubectl get nodes --no-headers | awk '{print $2}' | grep -vc '^Ready$'
+  register: not_ready_count
+  retries: 30
+  delay: 10
+  until: not_ready_count.stdout | int == 0
+  changed_when: false
+  environment:
+    KUBECONFIG: "{{ rke2_kubeconfig }}"

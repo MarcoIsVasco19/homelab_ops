@@ -1,0 +1,8 @@
+---
+- name: Configure cluster addons and register in Rancher
+  hosts: k8s_cp_bootstrap
+  become: true
+  gather_facts: true
+  roles:
+    - rke2_addons
+    - rancher_register

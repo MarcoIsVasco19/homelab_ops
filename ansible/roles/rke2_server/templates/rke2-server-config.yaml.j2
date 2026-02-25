@@ -1,0 +1,20 @@
+write-kubeconfig-mode: "{{ rke2_write_kubeconfig_mode }}"
+token: "{{ rke2_token }}"
+cni:
+  - "{{ rke2_cni }}"
+cluster-cidr: "{{ rke2_cluster_cidr }}"
+service-cidr: "{{ rke2_service_cidr }}"
+cluster-dns: "{{ rke2_cluster_dns }}"
+disable-kube-proxy: {{ rke2_disable_kube_proxy | lower }}
+node-name: "{{ inventory_hostname }}"
+{% if rke2_tls_sans | length > 0 %}
+tls-san:
+{% for san in rke2_tls_sans %}
+  - "{{ san }}"
+{% endfor %}
+{% endif %}
+{% if inventory_hostname in groups['k8s_cp_bootstrap'] %}
+cluster-init: true
+{% else %}
+server: "{{ rke2_server_url }}"
+{% endif %}
