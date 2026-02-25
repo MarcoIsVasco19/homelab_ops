@@ -1,6 +1,6 @@
 # tofu quickstart
 
-This directory contains the OpenTofu stack that provisions Proxmox VMs using the `suseleap_micro_vm` module and cloud-init snippets.
+This directory contains the OpenTofu stack that provisions Proxmox VMs using the `suseleap_micro_vm` module and dynamically rendered cloud-init snippets.
 
 For full project documentation, see:
 - [../README.md](../README.md)
@@ -13,11 +13,10 @@ For full project documentation, see:
 2. Update cloud-init files:
 - `cloud-init/templates/user-data.tpl.yaml` (single template)
 
-3. Sync cloud-init files to Proxmox snippets datastore:
+3. Set SSH public keys used by cloud-init rendering in OpenTofu:
 
-```bash
-./scripts/sync-cloud-init.sh --host 1.2.3.4 --render
-```
+- `TF_VAR_root_ssh_public_key`
+- `TF_VAR_ansible_ssh_public_key`
 
 4. Load environment variables with direnv:
 
@@ -37,12 +36,9 @@ tofu apply
 
 ## Notes
 
-- `user_data_file_id` values in `nodes.auto.tfvars` must match synced snippet names, e.g. `local:snippets/k8s-cp-01-userdata.yaml`.
+- Cloud-init snippets are rendered/uploaded by OpenTofu per-node during apply.
+- Node networking defaults to DHCP. Set `ipv4_cidr` (and usually `ipv4_gateway`) per node in `nodes.auto.tfvars` to use static IPs.
 - `disk_gb` defaults to `32` when omitted.
-- Per-node cloud-init files are rendered into `cloud-init/rendered/` by `scripts/render-cloud-init.sh`.
-- Renderer reads separate SSH keys for `root` and `ansible` users.
-- `root` key: `ROOT_SSH_PUBLIC_KEY` or `ROOT_SSH_PUB_KEY_FILE` (legacy `SSH_PUBLIC_KEY` / `SSH_PUB_KEY_FILE` also supported).
-- `ansible` key: `ANSIBLE_SSH_PUBLIC_KEY` or `ANSIBLE_SSH_PUB_KEY_FILE` (defaults to `~/.ssh/id_ed25519_ansible.pub`).
 
 ## Environment variables
 
@@ -50,10 +46,10 @@ Set these in `.envrc.local`:
 
 - `TF_VAR_proxmox_api_token` (required)
 - `TF_VAR_proxmox_endpoint` (optional override)
+- `TF_VAR_root_ssh_public_key` (required for cloud-init)
+- `TF_VAR_ansible_ssh_public_key` (required for cloud-init)
 - `AWS_PROFILE` or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` (+ optional `AWS_SESSION_TOKEN`)
 - `AWS_REGION` (defaults to `eu-central-1` via `.envrc`)
-- `ROOT_SSH_PUB_KEY_FILE` or `ROOT_SSH_PUBLIC_KEY` for root cloud-init key
-- `ANSIBLE_SSH_PUB_KEY_FILE` or `ANSIBLE_SSH_PUBLIC_KEY` for ansible cloud-init key
 
 For full details, see [../README.md](../README.md).
 

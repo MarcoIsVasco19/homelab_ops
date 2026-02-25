@@ -3,7 +3,7 @@ Infrastructure-as-Code for homelab provisioning on Proxmox using OpenTofu.
 
 ## What this repo does
 
-The `tofu/` stack creates Proxmox VMs from an imported qcow2 image and configures them with cloud-init snippets.
+The `tofu/` stack creates Proxmox VMs from an imported qcow2 image and configures them with cloud-init snippets rendered/uploaded by OpenTofu.
 
 Current default target:
 - openSUSE Leap Micro 6.2
@@ -15,9 +15,6 @@ Current default target:
 - `tofu/` OpenTofu root module
 - `tofu/modules/suseleap_micro_vm/` VM module (cloud-init based)
 - `tofu/cloud-init/templates/` cloud-init template source files
-- `tofu/cloud-init/rendered/` generated per-node cloud-init files
-- `tofu/scripts/render-cloud-init.sh` renders per-node cloud-init files from template + `nodes.auto.tfvars`
-- `tofu/scripts/sync-cloud-init.sh` sync helper to upload rendered files to Proxmox snippets storage
 - `tofu/nodes.auto.tfvars` environment-specific VM definitions
 
 ## Prerequisites
@@ -26,7 +23,6 @@ Current default target:
 - Access to a Proxmox node/API endpoint
 - Proxmox API token with VM and datastore permissions
 - openSUSE Leap Micro qcow2 image already imported into Proxmox datastore
-- `rsync` and SSH access to the Proxmox node (for syncing cloud-init files)
 
 ## Environment management with direnv
 
@@ -84,28 +80,18 @@ Defaults to `eu-central-1` in `tofu/.envrc` if unset.
 - `AWS_EC2_METADATA_DISABLED`:
 Set to `true` in `tofu/.envrc` to avoid local IMDS credential lookup noise.
 
-- `SSH_PUB_KEY_FILE` (optional):
-Path to SSH public key used by cloud-init renderer.
-Default: `~/.ssh/id_ed25519.pub`
+- `TF_VAR_root_ssh_public_key` (required):
+SSH public key for the `root` user provisioned via cloud-init.
 
-- `SSH_PUBLIC_KEY` (optional):
-Inline SSH public key used by cloud-init renderer.
-If set, it takes precedence over `SSH_PUB_KEY_FILE`.
+- `TF_VAR_ansible_ssh_public_key` (required):
+SSH public key for the `ansible` user provisioned via cloud-init.
 
 ## First-time setup
 
 1. Edit VM settings in `tofu/nodes.auto.tfvars`
 2. Set `base_image_import_from` to your imported qcow2 file ID
-3. Render + sync cloud-init files to Proxmox snippets:
-
-```bash
-cd tofu
-./scripts/sync-cloud-init.sh --host 1.2.3.4 --render
-```
-
-`render-cloud-init.sh` reads SSH key from `SSH_PUBLIC_KEY` or `SSH_PUB_KEY_FILE` (default `~/.ssh/id_ed25519.pub`).
-
-4. Ensure each node’s `user_data_file_id` in `nodes.auto.tfvars` matches uploaded snippet file names (for datastore `local`, format is `local:snippets/<file>.yaml`)
+3. Set `TF_VAR_root_ssh_public_key` and `TF_VAR_ansible_ssh_public_key` in `tofu/.envrc.local`.
+4. Optionally set per-node `ipv4_cidr` + `ipv4_gateway` for static IP; omit both to use DHCP.
 
 ## Deploy
 
@@ -137,18 +123,10 @@ After migration, state is stored in S3 at the configured `bucket` + `key`.
 
 ## Common operations
 
-- Upload updated cloud-init files:
-
-```bash
-cd tofu
-./scripts/sync-cloud-init.sh --host 1.2.3.4 --render
-```
-
 - Add another VM:
-Edit `tofu/nodes.auto.tfvars` under `nodes` with a unique `vm_id`, hostname, sizing, tags, and `user_data_file_id`.
+Edit `tofu/nodes.auto.tfvars` under `nodes` with a unique `vm_id`, hostname, sizing, tags, and optional `user_data_file_name` / `ipv4_cidr` / `ipv4_gateway`.
 
 ## Notes
 
 - `disk_gb` defaults to `32` if omitted.
 - Existing VMs cannot be shrunk by Proxmox. If a plan tries to shrink disk, set `disk_gb` to current size or larger.
-- For local snippets datastore, files are typically stored at `/var/lib/vz/snippets` on the Proxmox node.

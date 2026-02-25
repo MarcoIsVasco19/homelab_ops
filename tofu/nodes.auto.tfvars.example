@@ -9,8 +9,9 @@ bridge                = "vmbr0"
 # Manually prepared openSUSE Leap Micro 6.2 image in local import storage
 base_image_import_from = "local:import/openSUSE-Leap-Micro.x86_64-Default-qcow.qcow2"
 
-# Cloud-init files live in ./cloud-init and are synced to Proxmox snippets
-# with: ./scripts/sync-cloud-init.sh --host <INSERT-PVE-IP>
+# Cloud-init snippets are rendered/uploaded dynamically by OpenTofu.
+# Optional: set user_data_file_name per node to control snippet filenames.
+# Optional: set ipv4_cidr (+ ipv4_gateway) for static IP; omit for DHCP.
 nodes = {
   cp1 = {
     vm_id     = 201,
@@ -19,23 +20,25 @@ nodes = {
     memory_mb = 4096,
     tags      = ["k8s", "cp"],
     disk_gb   = 32,
+    # ipv4_cidr    = "192.168.2.101/24"
+    # ipv4_gateway = "192.168.2.1"
 
-    user_data_file_id = "local:snippets/k8s-cp-01-userdata.yaml"
+    user_data_file_name = "k8s-cp-01-userdata.yaml"
   }
   # cp2 = {
   #   vm_id = 202, hostname = "k8s-cp-02", cores = 2, memory_mb = 4096, tags = ["k8s","controlplane"]
-  #   user_data_file_id = "local:snippets/k8s-cp-02-userdata.yaml"
+  #   user_data_file_name = "k8s-cp-02-userdata.yaml"
   # }
   # cp3 = {
   #   vm_id = 203, hostname = "k8s-cp-03", cores = 2, memory_mb = 4096, tags = ["k8s","controlplane"]
-  #   user_data_file_id = "local:snippets/k8s-cp-03-userdata.yaml"
+  #   user_data_file_name = "k8s-cp-03-userdata.yaml"
   # }
   # wkr1 = {
   #   vm_id = 211, hostname = "k8s-wkr-01", cores = 4, memory_mb = 8192, tags = ["k8s","worker"]
-  #   user_data_file_id = "local:snippets/k8s-wkr-01-userdata.yaml"
+  #   user_data_file_name = "k8s-wkr-01-userdata.yaml"
   # }
   # wkr2 = {
   #   vm_id = 212, hostname = "k8s-wkr-02", cores = 4, memory_mb = 8192, tags = ["k8s","worker"]
-  #   user_data_file_id = "local:snippets/k8s-wkr-02-userdata.yaml"
+  #   user_data_file_name = "k8s-wkr-02-userdata.yaml"
   # }
 }

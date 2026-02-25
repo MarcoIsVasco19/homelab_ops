@@ -5,6 +5,9 @@
 export TF_VAR_proxmox_api_token='root@pam!tofu=REPLACE_ME'
 # Optional if not set in nodes.auto.tfvars:
 # export TF_VAR_proxmox_endpoint='https://192.168.2.69:8006/'
+# Required for dynamic cloud-init rendering in OpenTofu:
+# export TF_VAR_root_ssh_public_key='ssh-ed25519 AAAA...'
+# export TF_VAR_ansible_ssh_public_key='ssh-ed25519 AAAA...'
 
 # AWS credentials for S3 backend
 # Use either AWS_PROFILE or static keys.
@@ -14,6 +17,7 @@ export AWS_PROFILE='default'
 # export AWS_SESSION_TOKEN='REPLACE_ME'
 
 # Cloud-init rendering
+# Legacy script-based rendering vars (optional):
 # Root user key (legacy SSH_PUB_KEY_FILE / SSH_PUBLIC_KEY also work)
 # export ROOT_SSH_PUB_KEY_FILE="$HOME/.ssh/id_ed25519.pub"
 # export ROOT_SSH_PUBLIC_KEY='ssh-ed25519 AAAA...'

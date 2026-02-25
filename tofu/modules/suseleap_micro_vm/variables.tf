@@ -25,12 +25,23 @@ variable "base_image_import_from" {
 variable "nodes" {
   description = "Map of nodes to create."
   type = map(object({
-    vm_id             = number
-    hostname          = string
-    cores             = number
-    memory_mb         = number
-    disk_gb           = optional(number, 32)
-    tags              = optional(list(string), [])
-    user_data_file_id = string # e.g. local:snippets/k8s-cp-01-userdata.yaml
+    vm_id               = number
+    hostname            = string
+    cores               = number
+    memory_mb           = number
+    disk_gb             = optional(number, 32)
+    tags                = optional(list(string), [])
+    ipv4_cidr           = optional(string)
+    ipv4_gateway        = optional(string)
+    user_data_file_id   = optional(string)
+    user_data_file_name = optional(string)
+  }))
+}
+
+variable "cloud_init_snippets" {
+  description = "Rendered cloud-init snippets keyed by node key."
+  type = map(object({
+    file_name = string
+    content   = string
   }))
 }

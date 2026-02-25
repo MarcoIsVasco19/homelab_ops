@@ -1,17 +1,17 @@
 #cloud-config
-hostname: __HOSTNAME__
+hostname: ${hostname}
 manage_etc_hosts: true
 
 users:
   - name: root
     ssh_authorized_keys:
-      - __ROOT_SSH_PUBLIC_KEY__
+      - ${root_ssh_public_key}
   - name: ansible
     shell: /bin/bash
     lock_passwd: true
     sudo: ALL=(ALL) NOPASSWD:ALL
     ssh_authorized_keys:
-      - __ANSIBLE_SSH_PUBLIC_KEY__
+      - ${ansible_ssh_public_key}
 
 write_files:
   - path: /etc/sysctl.d/99-kubernetes.conf
