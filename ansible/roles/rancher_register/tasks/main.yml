@@ -1,7 +1,15 @@
 ---
-- name: Register cluster in Rancher via import manifest URL
+- name: Download Rancher import manifest URL
+  ansible.builtin.get_url:
+    url: "{{ rancher_import_manifest_url }}"
+    dest: /tmp/rancher-import.yaml
+    mode: "0644"
+    validate_certs: "{{ rancher_validate_certs | default(true) }}"
+  when: rancher_import_manifest_url | length > 0
+
+- name: Register cluster in Rancher via downloaded import manifest
   ansible.builtin.command:
-    cmd: "/var/lib/rancher/rke2/bin/kubectl apply -f {{ rancher_import_manifest_url }}"
+    cmd: "/var/lib/rancher/rke2/bin/kubectl apply -f /tmp/rancher-import.yaml"
   when: rancher_import_manifest_url | length > 0
   environment:
     KUBECONFIG: "{{ rke2_kubeconfig }}"

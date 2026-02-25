@@ -24,11 +24,12 @@ This directory provisions an HA RKE2 cluster on:
 
 Edit:
 
-- `inventory/hosts.yml` for node IPs.
+- `inventory/hosts.ini` for node IPs.
 - `inventory/group_vars/all.yml` for:
   - `rke2_token` (required, strong random secret)
   - CNI/Hubble settings
   - `rancher_import_manifest_url` or `rancher_registration_command`
+  - `rancher_validate_certs` (`false` for self-signed Rancher certs in lab environments)
 
 ## Run
 

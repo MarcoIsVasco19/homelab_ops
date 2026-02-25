@@ -36,7 +36,7 @@
 - name: Wait until all cluster nodes are Ready
   ansible.builtin.shell: |
     set -o pipefail
-    /var/lib/rancher/rke2/bin/kubectl get nodes --no-headers | awk '{print $2}' | grep -vc '^Ready$'
+    /var/lib/rancher/rke2/bin/kubectl get nodes --no-headers | awk '$2 != "Ready" {count++} END {print count+0}'
   register: not_ready_count
   retries: 30
   delay: 10

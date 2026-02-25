@@ -1,6 +1,6 @@
 # RKE2 settings
 rke2_version: "v1.35.1+rke2r1"
-rke2_token: "ENTER_RKE2_TOKEN_HERE"
+rke2_token: "CeBJ2cAy8ens8awVeUxqaQRygpUs0cxEb4WLToSuGT79HFgbMXkmrLY8gqhe4j9f"
 rke2_server_url: "https://{{ hostvars[groups['k8s_control_plane'][0]].ansible_host }}:9345"
 rke2_config_dir: "/etc/rancher/rke2"
 rke2_kubeconfig: "/etc/rancher/rke2/rke2.yaml"
@@ -20,5 +20,8 @@ rke2_tls_sans: []
 # Rancher registration
 # Verify your endpoint format (likely sslip.io, not sslip.op)
 rancher_server_url: "https://192.168.2.18.sslip.io"
-rancher_import_manifest_url: ""
+rancher_import_manifest_url: "https://192.168.2.100.sslip.io/v3/import/tc9z2qq5c76rvjdrrx6wxfn8znrk7xs6lttrdsjlln9h75kh62f4fd_c-nkqvt.yaml"
 rancher_registration_command: ""
+
+# Validate Rancher TLS certificate when downloading import manifest
+rancher_validate_certs: false

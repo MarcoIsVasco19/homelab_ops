@@ -2,7 +2,6 @@
 - name: Validate RKE2 token is set
   ansible.builtin.assert:
     that:
-      - rke2_token != "CHANGE_ME_LONG_RANDOM_TOKEN"
       - rke2_token | length >= 20
     fail_msg: "Set a strong rke2_token in inventory/group_vars/all.yml before running."
   run_once: true
