@@ -40,7 +40,9 @@ tofu apply
 - `user_data_file_id` values in `nodes.auto.tfvars` must match synced snippet names, e.g. `local:snippets/k8s-cp-01-userdata.yaml`.
 - `disk_gb` defaults to `32` when omitted.
 - Per-node cloud-init files are rendered into `cloud-init/rendered/` by `scripts/render-cloud-init.sh`.
-- Renderer reads SSH key from `SSH_PUBLIC_KEY` or `SSH_PUB_KEY_FILE` (defaults to `~/.ssh/id_ed25519.pub`).
+- Renderer reads separate SSH keys for `root` and `ansible` users.
+- `root` key: `ROOT_SSH_PUBLIC_KEY` or `ROOT_SSH_PUB_KEY_FILE` (legacy `SSH_PUBLIC_KEY` / `SSH_PUB_KEY_FILE` also supported).
+- `ansible` key: `ANSIBLE_SSH_PUBLIC_KEY` or `ANSIBLE_SSH_PUB_KEY_FILE` (defaults to `~/.ssh/id_ed25519_ansible.pub`).
 
 ## Environment variables
 
@@ -50,7 +52,8 @@ Set these in `.envrc.local`:
 - `TF_VAR_proxmox_endpoint` (optional override)
 - `AWS_PROFILE` or `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` (+ optional `AWS_SESSION_TOKEN`)
 - `AWS_REGION` (defaults to `eu-central-1` via `.envrc`)
-- `SSH_PUB_KEY_FILE` or `SSH_PUBLIC_KEY` for cloud-init rendering
+- `ROOT_SSH_PUB_KEY_FILE` or `ROOT_SSH_PUBLIC_KEY` for root cloud-init key
+- `ANSIBLE_SSH_PUB_KEY_FILE` or `ANSIBLE_SSH_PUBLIC_KEY` for ansible cloud-init key
 
 For full details, see [../README.md](../README.md).
 

@@ -14,5 +14,10 @@ export AWS_PROFILE='default'
 # export AWS_SESSION_TOKEN='REPLACE_ME'
 
 # Cloud-init rendering
-# export SSH_PUB_KEY_FILE="$HOME/.ssh/id_ed25519.pub"
-# export SSH_PUBLIC_KEY='ssh-ed25519 AAAA...'
+# Root user key (legacy SSH_PUB_KEY_FILE / SSH_PUBLIC_KEY also work)
+# export ROOT_SSH_PUB_KEY_FILE="$HOME/.ssh/id_ed25519.pub"
+# export ROOT_SSH_PUBLIC_KEY='ssh-ed25519 AAAA...'
+
+# Ansible user key (separate keypair recommended)
+# export ANSIBLE_SSH_PUB_KEY_FILE="$HOME/.ssh/id_ed25519_ansible.pub"
+# export ANSIBLE_SSH_PUBLIC_KEY='ssh-ed25519 AAAA...'

@@ -4,12 +4,16 @@ set -euo pipefail
 TFVARS_FILE="${TFVARS_FILE:-./nodes.auto.tfvars}"
 TEMPLATE_FILE="${TEMPLATE_FILE:-./cloud-init/templates/user-data.tpl.yaml}"
 OUT_DIR="${OUT_DIR:-./cloud-init/rendered}"
-SSH_PUB_KEY="${SSH_PUBLIC_KEY:-}"
-SSH_PUB_KEY_FILE="${SSH_PUB_KEY_FILE:-$HOME/.ssh/id_ed25519.pub}"
+ROOT_SSH_PUB_KEY="${ROOT_SSH_PUBLIC_KEY:-${SSH_PUBLIC_KEY:-}}"
+ROOT_SSH_PUB_KEY_FILE="${ROOT_SSH_PUB_KEY_FILE:-${SSH_PUB_KEY_FILE:-$HOME/.ssh/id_ed25519.pub}}"
+ANSIBLE_SSH_PUB_KEY="${ANSIBLE_SSH_PUBLIC_KEY:-}"
+ANSIBLE_SSH_PUB_KEY_FILE="${ANSIBLE_SSH_PUB_KEY_FILE:-$HOME/.ssh/id_ed25519_ansible.pub}"
 
 usage() {
   cat <<USAGE
 Usage: $(basename "$0") [--tfvars ./nodes.auto.tfvars] [--template ./cloud-init/templates/user-data.tpl.yaml] [--out-dir ./cloud-init/rendered] [--ssh-pub-key 'ssh-ed25519 ...'] [--ssh-pub-key-file ~/.ssh/id_ed25519.pub]
+                        [--root-ssh-pub-key 'ssh-ed25519 ...'] [--root-ssh-pub-key-file ~/.ssh/id_ed25519.pub]
+                        [--ansible-ssh-pub-key 'ssh-ed25519 ...'] [--ansible-ssh-pub-key-file ~/.ssh/id_ed25519_ansible.pub]
 USAGE
 }
 
@@ -18,8 +22,10 @@ while [[ $# -gt 0 ]]; do
     --tfvars) TFVARS_FILE="$2"; shift 2 ;;
     --template) TEMPLATE_FILE="$2"; shift 2 ;;
     --out-dir) OUT_DIR="$2"; shift 2 ;;
-    --ssh-pub-key) SSH_PUB_KEY="$2"; shift 2 ;;
-    --ssh-pub-key-file) SSH_PUB_KEY_FILE="$2"; shift 2 ;;
+    --ssh-pub-key|--root-ssh-pub-key) ROOT_SSH_PUB_KEY="$2"; shift 2 ;;
+    --ssh-pub-key-file|--root-ssh-pub-key-file) ROOT_SSH_PUB_KEY_FILE="$2"; shift 2 ;;
+    --ansible-ssh-pub-key) ANSIBLE_SSH_PUB_KEY="$2"; shift 2 ;;
+    --ansible-ssh-pub-key-file) ANSIBLE_SSH_PUB_KEY_FILE="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown arg: $1" >&2; usage; exit 1 ;;
   esac
@@ -35,14 +41,25 @@ if [[ ! -f "$TEMPLATE_FILE" ]]; then
   exit 1
 fi
 
-if [[ -z "$SSH_PUB_KEY" ]]; then
-  if [[ -f "$SSH_PUB_KEY_FILE" ]]; then
-    SSH_PUB_KEY="$(<"$SSH_PUB_KEY_FILE")"
+if [[ -z "$ROOT_SSH_PUB_KEY" ]]; then
+  if [[ -f "$ROOT_SSH_PUB_KEY_FILE" ]]; then
+    ROOT_SSH_PUB_KEY="$(<"$ROOT_SSH_PUB_KEY_FILE")"
   fi
 fi
 
-if [[ -z "$SSH_PUB_KEY" ]]; then
-  echo "No SSH public key found. Provide --ssh-pub-key or --ssh-pub-key-file." >&2
+if [[ -z "$ANSIBLE_SSH_PUB_KEY" ]]; then
+  if [[ -f "$ANSIBLE_SSH_PUB_KEY_FILE" ]]; then
+    ANSIBLE_SSH_PUB_KEY="$(<"$ANSIBLE_SSH_PUB_KEY_FILE")"
+  fi
+fi
+
+if [[ -z "$ROOT_SSH_PUB_KEY" ]]; then
+  echo "No root SSH public key found. Provide --root-ssh-pub-key or --root-ssh-pub-key-file." >&2
+  exit 1
+fi
+
+if [[ -z "$ANSIBLE_SSH_PUB_KEY" ]]; then
+  echo "No ansible SSH public key found. Provide --ansible-ssh-pub-key or --ansible-ssh-pub-key-file." >&2
   exit 1
 fi
 
@@ -103,10 +120,11 @@ for entry in "${entries[@]}"; do
   out_file_name="${rest##*|}"
   out_path="$OUT_DIR/$out_file_name"
 
-  awk -v host="$hostname" -v key="$SSH_PUB_KEY" '
+  awk -v host="$hostname" -v root_key="$ROOT_SSH_PUB_KEY" -v ansible_key="$ANSIBLE_SSH_PUB_KEY" '
     {
       gsub("__HOSTNAME__", host)
-      gsub("__SSH_PUBLIC_KEY__", key)
+      gsub("__ROOT_SSH_PUBLIC_KEY__", root_key)
+      gsub("__ANSIBLE_SSH_PUBLIC_KEY__", ansible_key)
       print
     }
   ' "$TEMPLATE_FILE" > "$out_path"

@@ -5,7 +5,13 @@ manage_etc_hosts: true
 users:
   - name: root
     ssh_authorized_keys:
-      - __SSH_PUBLIC_KEY__
+      - __ROOT_SSH_PUBLIC_KEY__
+  - name: ansible
+    shell: /bin/bash
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - __ANSIBLE_SSH_PUBLIC_KEY__
 
 write_files:
   - path: /etc/sysctl.d/99-kubernetes.conf
