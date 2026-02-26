@@ -10,7 +10,7 @@ This directory provisions an HA RKE2 cluster on:
 - `roles/common_prep`: host OS prep (swap, sysctl, kernel modules, prereqs).
 - `roles/rke2_server`: install/configure control-plane nodes.
 - `roles/rke2_agent`: install/configure worker nodes.
-- `roles/rke2_addons`: Cilium Hubble + ingress-nginx chart config.
+- `roles/rke2_addons`: critical addons (Cilium Hubble + ingress-nginx) via RKE2 static manifests.
 - `roles/rancher_register`: import/register cluster in Rancher.
 
 ## Playbooks
@@ -19,6 +19,8 @@ This directory provisions an HA RKE2 cluster on:
 - `playbooks/install-rke2.yml`: installs server/agent roles by host group.
 - `playbooks/addons-and-rancher.yml`: applies addon config + Rancher registration on bootstrap control plane.
 - `playbooks/site.yml`: orchestration wrapper importing all playbooks above.
+
+After Rancher registration, Fleet can deploy app addons from the separate `homelab_gitops` repository to any imported cluster.
 
 ## Configuration
 

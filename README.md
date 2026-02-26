@@ -16,6 +16,18 @@ Current default target:
 - `tofu/modules/suseleap_micro_vm/` VM module (cloud-init based)
 - `tofu/cloud-init/templates/` cloud-init template source files
 - `tofu/nodes.auto.tfvars` environment-specific VM definitions
+- `ansible/` RKE2 + Rancher bootstrap and registration automation
+- Fleet GitOps app bundles now live in the separate `homelab_gitops` repository
+
+## Kubernetes addon strategy
+
+- Critical addons are applied during cluster bootstrap from Ansible/RKE2 static manifests:
+  - Cilium (+ Hubble)
+  - ingress-nginx
+- App-level addons are applied by Rancher Fleet from `homelab_gitops`:
+  - MetalLB
+  - Rancher kube-monitoring (`rancher-monitoring`)
+  - FluxCD Operator
 
 ## Prerequisites
 
