@@ -68,15 +68,15 @@ nodes = {
 
     # user_data_file_name = "k8s-wkr-02-userdata.yaml"
   }
-  wkr3 = {
-    vm_id     = 213
-    hostname  = "k8s-wkr-03"
-    cores     = 4
-    memory_mb = 4096
-    tags      = ["k8s", "worker"]
-    ipv4_cidr    = "192.168.2.55/24"
-    ipv4_gateway = "192.168.2.254"
+  # wkr3 = {
+  #   vm_id     = 213
+  #   hostname  = "k8s-wkr-03"
+  #   cores     = 4
+  #   memory_mb = 4096
+  #   tags      = ["k8s", "worker"]
+  #   ipv4_cidr    = "192.168.2.55/24"
+  #   ipv4_gateway = "192.168.2.254"
 
-    # user_data_file_id = "k8s-wkr-03-userdata.yaml"
-  }
+  #   # user_data_file_id = "k8s-wkr-03-userdata.yaml"
+  # }
 }
