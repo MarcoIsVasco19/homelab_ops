@@ -29,6 +29,71 @@ Current default target:
   - Rancher kube-monitoring (`rancher-monitoring`)
   - FluxCD Operator
 
+## Architecture Overview
+``` mermaid
+flowchart TB
+
+%% =========================
+%% External / LAN Layer
+%% =========================
+
+subgraph LAN["Home / LAN Network (192.168.2.0/24)"]
+    Admin["Admin / CI / kubectl"]
+    API_VIP["HAProxy VM\nAPI VIP: 192.168.2.10:6443"]
+end
+
+%% =========================
+%% Kubernetes Control Plane
+%% =========================
+
+subgraph ControlPlane["RKE2 Control Plane Nodes"]
+    CP1["cp1\nrke2-server\netcd member"]
+    CP2["cp2\nrke2-server\netcd member"]
+    CP3["cp3\nrke2-server\netcd member"]
+end
+
+%% =========================
+%% Worker Nodes
+%% =========================
+
+subgraph Workers["RKE2 Worker Nodes"]
+    W1["worker1\nrke2-agent"]
+    W2["worker2\nrke2-agent"]
+    W3["worker3\nrke2-agent"]
+end
+
+%% =========================
+%% Kubernetes Services Layer
+%% =========================
+
+subgraph K8sServices["Kubernetes Service Layer"]
+    MetalLB["MetalLB\nIP Pool: 192.168.2.240-250"]
+    Ingress["ingress-nginx\nService Type: LoadBalancer\nEXTERNAL-IP: 192.168.2.241"]
+    Apps["Applications / Pods"]
+end
+
+%% =========================
+%% API Traffic Flow
+%% =========================
+
+Admin -->|kubectl / Rancher\nAPI calls| API_VIP
+W1 -->|Cluster API| API_VIP
+W2 -->|Cluster API| API_VIP
+W3 -->|Cluster API| API_VIP
+
+API_VIP --> CP1
+API_VIP --> CP2
+API_VIP --> CP3
+
+%% =========================
+%% Application Traffic Flow
+%% =========================
+
+Admin -->|HTTP/HTTPS\nApp Traffic| Ingress
+MetalLB --> Ingress
+Ingress --> Apps
+```
+
 ## Prerequisites
 
 - OpenTofu installed (`tofu`)

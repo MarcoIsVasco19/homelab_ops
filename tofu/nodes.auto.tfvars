@@ -10,6 +10,18 @@ bridge                = "vmbr0"
 base_image_import_from = "local:import/openSUSE-Leap-Micro.x86_64-Default-qcow.qcow2"
 
 nodes = {
+  haproxy = {
+    vm_id     = 190
+    hostname  = "k8s-lb-01"
+    cores     = 2
+    memory_mb = 2048
+    tags      = ["k8s", "lb"]
+    disk_gb   = 32
+    ipv4_cidr    = "192.168.2.45/24"
+    ipv4_gateway = "192.168.2.254"
+
+    # user_data_file_name = "k8s-lb-01-userdata.yaml"
+  }
   cp1 = {
     vm_id     = 201
     hostname  = "k8s-cp-01"
