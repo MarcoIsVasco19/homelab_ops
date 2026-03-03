@@ -39,7 +39,7 @@ flowchart TB
 
 subgraph LAN["Home / LAN Network (192.168.2.0/24)"]
     Admin["Admin / CI / kubectl"]
-    API_VIP["HAProxy VM\nAPI VIP: 192.168.2.10:6443"]
+    API_VIP["HAProxy VM<br/>API VIP: 192.168.2.10:6443"]
 end
 
 %% =========================
@@ -47,9 +47,9 @@ end
 %% =========================
 
 subgraph ControlPlane["RKE2 Control Plane Nodes"]
-    CP1["cp1\nrke2-server\netcd member"]
-    CP2["cp2\nrke2-server\netcd member"]
-    CP3["cp3\nrke2-server\netcd member"]
+    CP1["cp1<br/>rke2-server<br/>etcd member"]
+    CP2["cp2<br/>rke2-server<br/>etcd member"]
+    CP3["cp3<br/>rke2-server<br/>etcd member"]
 end
 
 %% =========================
@@ -57,9 +57,9 @@ end
 %% =========================
 
 subgraph Workers["RKE2 Worker Nodes"]
-    W1["worker1\nrke2-agent"]
-    W2["worker2\nrke2-agent"]
-    W3["worker3\nrke2-agent"]
+    W1["worker1<br/>rke2-agent"]
+    W2["worker2<br/>rke2-agent"]
+    W3["worker3<br/>rke2-agent"]
 end
 
 %% =========================
@@ -67,8 +67,8 @@ end
 %% =========================
 
 subgraph K8sServices["Kubernetes Service Layer"]
-    MetalLB["MetalLB\nIP Pool: 192.168.2.240-250"]
-    Ingress["ingress-nginx\nService Type: LoadBalancer\nEXTERNAL-IP: 192.168.2.241"]
+    MetalLB["MetalLB<br/>IP Pool: 192.168.2.240-250"]
+    Ingress["ingress-nginx<br/>Service Type: LoadBalancer<br/>EXTERNAL-IP: 192.168.2.241"]
     Apps["Applications / Pods"]
 end
 
@@ -76,7 +76,7 @@ end
 %% API Traffic Flow
 %% =========================
 
-Admin -->|kubectl / Rancher\nAPI calls| API_VIP
+Admin -->|kubectl / Rancher<br/>API calls| API_VIP
 W1 -->|Cluster API| API_VIP
 W2 -->|Cluster API| API_VIP
 W3 -->|Cluster API| API_VIP
@@ -89,10 +89,31 @@ API_VIP --> CP3
 %% Application Traffic Flow
 %% =========================
 
-Admin -->|HTTP/HTTPS\nApp Traffic| Ingress
+Admin -->|HTTP/HTTPS<br/>App Traffic| Ingress
 MetalLB --> Ingress
 Ingress --> Apps
 ```
+
+### API Traffic Path
+``` shell
+Admin / Workers
+        ↓
+HAProxy (192.168.2.45:6443)
+        ↓
+Control Plane Nodes
+```
+
+### Application Traffic Path (Data Plane)
+``` shell
+User
+   ↓
+MetalLB External IP (192.168.2.200)
+   ↓
+ingress-nginx
+   ↓
+Pods
+```
+
 
 ## Prerequisites
 
