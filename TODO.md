@@ -1,6 +1,6 @@
 # TODO
 
-Last updated: 03-03-2026
+Last updated: 03-03-2026  
 Owner: Marco Marques
 
 ## Priorities This Week
@@ -11,9 +11,7 @@ Owner: Marco Marques
 - [ ] < placeholder>
 
 ## Follow-ups
-- [ ] <doc update>
-- [ ] <cleanup/refactor>
-- [ ] <next step>
+- [ ] doc update
 
 ## Done
 
