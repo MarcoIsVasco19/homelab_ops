@@ -1,9 +1,4 @@
 locals {
-  cloud_init_template_paths = {
-    suse_leap_micro = "${path.module}/cloud-init/templates/user-data.tpl.yaml"
-    suse_leap_16    = "${path.module}/cloud-init/templates/user-data.leap16.tpl.yaml"
-  }
-
   cloud_init_snippets = {
     for node_key, node in var.nodes : node_key => {
       file_name = coalesce(
@@ -11,7 +6,7 @@ locals {
         try(element(reverse(split("/", node.user_data_file_id)), 0), null),
         "${node.hostname}-userdata.yaml"
       )
-      content = templatefile(local.cloud_init_template_paths[try(node.cloud_init_profile, "suse_leap_micro")], {
+      content = templatefile("${path.module}/cloud-init/templates/user-data.tpl.yaml", {
         hostname               = node.hostname
         root_ssh_public_key    = var.root_ssh_public_key
         ansible_ssh_public_key = var.ansible_ssh_public_key

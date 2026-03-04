@@ -6,24 +6,19 @@ snippets_datastore_id = "local"
 vm_datastore_id       = "local-lvm"
 bridge                = "vmbr0"
 
-# Default image for nodes (used unless a node sets image_import_from)
 # Manually prepared openSUSE Leap Micro 6.2 image in local import storage
 base_image_import_from = "local:import/openSUSE-Leap-Micro.x86_64-Default-qcow.qcow2"
 
 nodes = {
   haproxy = {
-    vm_id              = 190
-    hostname           = "k8s-lb-01"
-    cores              = 2
-    memory_mb          = 2048
-    tags               = ["k8s", "lb"]
-    disk_gb            = 32
-    cloud_init_profile = "suse_leap_16"
-    # Override the default image for this mutable VM.
-    # Update the file name below to match your uploaded Leap 16 qcow2 exactly.
-    image_import_from = "local:import/Leap-16.0-Minimal-VM.x86_64-kvm-and-xen.qcow2"
-    ipv4_cidr         = "192.168.2.45/24"
-    ipv4_gateway      = "192.168.2.254"
+    vm_id        = 190
+    hostname     = "k8s-lb-01"
+    cores        = 2
+    memory_mb    = 2048
+    tags         = ["k8s", "lb"]
+    disk_gb      = 32
+    ipv4_cidr    = "192.168.2.45/24"
+    ipv4_gateway = "192.168.2.254"
 
     # user_data_file_name = "k8s-lb-01-userdata.yaml"
   }
