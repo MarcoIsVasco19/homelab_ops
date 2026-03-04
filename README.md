@@ -39,7 +39,7 @@ flowchart TB
 
 subgraph LAN["Home / LAN Network (192.168.2.0/24)"]
     Admin["Admin / CI / kubectl"]
-    API_VIP["HAProxy VM<br/>API VIP: 192.168.2.10:6443"]
+    API_VIP["HAProxy VM<br/>API VIP: 192.168.2.45:6443"]
 end
 
 %% =========================
@@ -67,8 +67,8 @@ end
 %% =========================
 
 subgraph K8sServices["Kubernetes Service Layer"]
-    MetalLB["MetalLB<br/>IP Pool: 192.168.2.240-250"]
-    Ingress["ingress-nginx<br/>Service Type: LoadBalancer<br/>EXTERNAL-IP: 192.168.2.241"]
+    MetalLB["MetalLB<br/>IP Pool: 192.168.2.200-210"]
+    Ingress["ingress-nginx<br/>Service Type: LoadBalancer<br/>EXTERNAL-IP: 192.168.2.200"]
     Apps["Applications / Pods"]
 end
 

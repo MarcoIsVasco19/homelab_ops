@@ -10,6 +10,9 @@ Owner: Marco Marques
 ## Kubernetes Tasks
 - [ ] < placeholder>
 
+## Nice-To-Haves
+- [ ] Install pihole as a LXC container on proxmox for DNS management (keep external to k8s)
+
 ## Follow-ups
 - [ ] doc update
 
