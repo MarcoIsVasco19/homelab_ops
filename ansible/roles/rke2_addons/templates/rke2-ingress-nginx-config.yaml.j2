@@ -1,0 +1,21 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-ingress-nginx
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    controller:
+      kind: {{ rke2_ingress_controller_kind }}
+      replicaCount: {{ rke2_ingress_controller_replica_count }}
+      publishService:
+        enabled: {{ rke2_ingress_publish_service_enabled | lower }}
+      service:
+        enabled: {{ rke2_ingress_service_enabled | lower }}
+        type: {{ rke2_ingress_service_type }}
+{% if rke2_ingress_service_annotations | length > 0 %}
+        annotations:
+{% for key, value in rke2_ingress_service_annotations.items() %}
+          {{ key }}: "{{ value }}"
+{% endfor %}
+{% endif %}

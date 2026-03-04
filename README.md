@@ -24,8 +24,8 @@ Current default target:
 - Critical addons are applied during cluster bootstrap from Ansible/RKE2 static manifests:
   - Cilium (+ Hubble)
   - ingress-nginx
+  - MetalLB (IPAddressPool + L2Advertisement)
 - App-level addons are applied by Rancher Fleet from `homelab_gitops`:
-  - MetalLB
   - Rancher kube-monitoring (`rancher-monitoring`)
   - FluxCD Operator
 

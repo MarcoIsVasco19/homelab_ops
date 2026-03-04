@@ -12,7 +12,7 @@ This directory provisions an HA RKE2 cluster on:
 - `roles/haproxy_api_lb`: install/configure HAProxy API load balancer for control-plane nodes.
 - `roles/rke2_server`: install/configure control-plane nodes.
 - `roles/rke2_agent`: install/configure worker nodes.
-- `roles/rke2_addons`: critical addons (Cilium Hubble + ingress-nginx) via RKE2 static manifests.
+- `roles/rke2_addons`: critical addons (Cilium Hubble + ingress-nginx + MetalLB) via RKE2 static manifests.
 - `roles/rancher_register`: import/register cluster in Rancher.
 
 ## Playbooks

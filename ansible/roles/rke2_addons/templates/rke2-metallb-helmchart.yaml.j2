@@ -1,0 +1,10 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: {{ rke2_metallb_chart_name }}
+  namespace: kube-system
+spec:
+  chart: {{ rke2_metallb_chart_name }}
+  repo: {{ rke2_metallb_chart_repo }}
+  targetNamespace: {{ rke2_metallb_namespace }}
+  createNamespace: true

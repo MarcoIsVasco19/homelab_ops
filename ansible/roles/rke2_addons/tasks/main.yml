@@ -1,37 +1,66 @@
 ---
+- name: Install GatewayAPI controller CRDS
+  block:
+    - name: Download GatewayAPI manifest to the cluster.
+      ansible.builtin.get_url:
+        url: https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
+        dest: /tmp/gatewayapi.yaml
+        mode: '0664'
+
+    - name: Apply GatewayAPI CRDs
+      ansible.builtin.command:
+        cmd: /var/lib/rancher/rke2/bin/kubectl apply -f /tmp/gatewayapi.yaml
+      register: gatewayapi_apply
+      changed_when: "' created' in gatewayapi_apply.stdout or ' configured' in gatewayapi_apply.stdout"
+      environment:
+        KUBECONFIG: "{{ rke2_kubeconfig }}"
+
 - name: Write Cilium HelmChartConfig with Hubble enabled
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: rke2-cilium-config.yaml.j2
     dest: /var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml
     mode: "0644"
-    content: |
-      apiVersion: helm.cattle.io/v1
-      kind: HelmChartConfig
-      metadata:
-        name: rke2-cilium
-        namespace: kube-system
-      spec:
-        valuesContent: |-
-          hubble:
-            enabled: {{ rke2_enable_hubble | lower }}
-            relay:
-              enabled: {{ rke2_enable_hubble | lower }}
-            ui:
-              enabled: {{ rke2_enable_hubble | lower }}
 
 - name: Write ingress-nginx HelmChartConfig
-  ansible.builtin.copy:
+  ansible.builtin.template:
+    src: rke2-ingress-nginx-config.yaml.j2
     dest: /var/lib/rancher/rke2/server/manifests/rke2-ingress-nginx-config.yaml
     mode: "0644"
-    content: |
-      apiVersion: helm.cattle.io/v1
-      kind: HelmChartConfig
-      metadata:
-        name: rke2-ingress-nginx
-        namespace: kube-system
-      spec:
-        valuesContent: |-
-          controller:
-            replicaCount: 2
+
+- name: Install and configure MetalLB
+  when: rke2_enable_metallb | bool
+  block:
+    - name: Write MetalLB HelmChart manifest
+      ansible.builtin.template:
+        src: rke2-metallb-helmchart.yaml.j2
+        dest: /var/lib/rancher/rke2/server/manifests/rke2-metallb-helmchart.yaml
+        mode: "0644"
+
+    - name: Wait for MetalLB CRD to be available
+      ansible.builtin.shell: |
+        set -o pipefail
+        /var/lib/rancher/rke2/bin/kubectl get crd ipaddresspools.metallb.io
+      register: metallb_ipaddresspool_crd
+      retries: 60
+      delay: 5
+      until: metallb_ipaddresspool_crd.rc == 0
+      changed_when: false
+      environment:
+        KUBECONFIG: "{{ rke2_kubeconfig }}"
+
+    - name: Write MetalLB IPAddressPool manifest
+      ansible.builtin.template:
+        src: rke2-metallb-ipaddresspool.yaml.j2
+        dest: /var/lib/rancher/rke2/server/manifests/rke2-metallb-ipaddresspool.yaml
+        mode: "0644"
+
+
+    - name: Write MetalLB L2Advertisement manifest
+      ansible.builtin.template:
+        src: rke2-metallb-l2advertisement.yaml.j2
+        dest: /var/lib/rancher/rke2/server/manifests/rke2-metallb-l2advertisement.yaml
+        mode: "0644"
+
 
 - name: Wait until all cluster nodes are Ready
   ansible.builtin.shell: |

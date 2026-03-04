@@ -1,0 +1,21 @@
+---
+rke2_ingress_controller_kind: "DaemonSet"
+rke2_ingress_controller_replica_count: 2
+rke2_ingress_publish_service_enabled: true
+rke2_ingress_service_enabled: true
+rke2_ingress_service_type: "LoadBalancer"
+rke2_ingress_service_annotations:
+  metallb.io/address-pool: "homelab-pool"
+
+rke2_enable_metallb: true
+rke2_metallb_chart_name: "metallb"
+rke2_metallb_chart_repo: "https://metallb.github.io/metallb"
+rke2_metallb_namespace: "metallb-system"
+rke2_metallb_ipaddress_pool_name: "homelab-pool"
+rke2_metallb_addresses:
+  - "192.168.2.200-192.168.2.210"
+rke2_metallb_auto_assign: true
+rke2_metallb_avoid_buggy_ips: false
+
+rke2_metallb_l2advertisement_name: "homelab-l2"
+rke2_metallb_l2_interfaces: []

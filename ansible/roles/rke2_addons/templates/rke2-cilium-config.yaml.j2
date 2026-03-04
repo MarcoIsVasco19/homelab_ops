@@ -1,0 +1,13 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-cilium
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    hubble:
+      enabled: {{ rke2_enable_hubble | lower }}
+      relay:
+        enabled: {{ rke2_enable_hubble | lower }}
+      ui:
+        enabled: {{ rke2_enable_hubble | lower }}
