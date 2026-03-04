@@ -2,12 +2,14 @@
 
 This directory provisions an HA RKE2 cluster on:
 
+- API load balancer: `k8s-lb-01` (HAProxy, TCP/6443)
 - Control plane: `k8s-cp-01`, `k8s-cp-02`, `k8s-cp-03`
 - Workers: `k8s-wkr-01`, `k8s-wkr-02`, `k8s-wkr-03`
 
 ## Role-Based Layout
 
 - `roles/common_prep`: host OS prep (swap, sysctl, kernel modules, prereqs).
+- `roles/haproxy_api_lb`: install/configure HAProxy API load balancer for control-plane nodes.
 - `roles/rke2_server`: install/configure control-plane nodes.
 - `roles/rke2_agent`: install/configure worker nodes.
 - `roles/rke2_addons`: critical addons (Cilium Hubble + ingress-nginx) via RKE2 static manifests.
@@ -15,6 +17,7 @@ This directory provisions an HA RKE2 cluster on:
 
 ## Playbooks
 
+- `playbooks/configure-api-lb.yml`: installs/configures HAProxy on `k8s_api_lb`.
 - `playbooks/prepare.yml`: runs `common_prep` on all nodes.
 - `playbooks/install-rke2.yml`: installs server/agent roles by host group.
 - `playbooks/addons-and-rancher.yml`: applies addon config + Rancher registration on bootstrap control plane.
@@ -26,7 +29,7 @@ After Rancher registration, Fleet can deploy app addons from the separate `homel
 
 Edit:
 
-- `inventory/hosts.ini` for node IPs.
+- `inventory/hosts.ini` for node IPs and host groups (`k8s_api_lb`, `k8s_control_plane`, `k8s_workers`).
 - `inventory/group_vars/all.yml` for:
   - `rke2_token` (required, strong random secret)
   - CNI/Hubble settings
@@ -43,6 +46,7 @@ ansible-playbook playbooks/site.yml
 Or run in phases:
 
 ```bash
+ansible-playbook playbooks/configure-api-lb.yml
 ansible-playbook playbooks/prepare.yml
 ansible-playbook playbooks/install-rke2.yml
 ansible-playbook playbooks/addons-and-rancher.yml

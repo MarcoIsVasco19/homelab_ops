@@ -1,0 +1,25 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    daemon
+    stats socket {{ haproxy_api_stats_socket }} mode 660 level admin
+
+defaults
+    log global
+    mode tcp
+    option tcplog
+    timeout connect {{ haproxy_api_connect_timeout }}
+    timeout client {{ haproxy_api_client_timeout }}
+    timeout server {{ haproxy_api_server_timeout }}
+
+frontend rke2_api_frontend
+    bind {{ haproxy_api_frontend_bind_address }}:{{ haproxy_api_frontend_port }}
+    default_backend {{ haproxy_api_backend_name }}
+
+backend {{ haproxy_api_backend_name }}
+    mode tcp
+    balance {{ haproxy_api_balance_algorithm }}
+    option tcp-check
+{% for host in groups[haproxy_api_backend_group] %}
+    server {{ host }} {{ hostvars[host].ansible_host | default(host) }}:{{ haproxy_api_backend_port }} check
+{% endfor %}

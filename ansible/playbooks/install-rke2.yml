@@ -10,6 +10,7 @@
   hosts: k8s_control_plane:!k8s_cp_bootstrap
   become: true
   gather_facts: true
+  serial: 1
   roles:
     - rke2_server
 

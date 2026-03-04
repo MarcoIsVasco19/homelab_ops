@@ -10,6 +10,7 @@
     src: rke2-server-config.yaml.j2
     dest: "{{ rke2_config_dir }}/config.yaml"
     mode: "0600"
+  notify: Restart rke2-server
 
 - name: Install RKE2 server binaries
   ansible.builtin.shell: |
@@ -22,6 +23,9 @@
     name: rke2-server
     enabled: true
     state: started
+
+- name: Apply pending rke2-server restart after config changes
+  ansible.builtin.meta: flush_handlers
 
 - name: Wait for kubeconfig to be created (bootstrap server only)
   ansible.builtin.wait_for:

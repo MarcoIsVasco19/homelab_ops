@@ -1,0 +1,126 @@
+---
+- name: Validate backend control-plane hosts are defined
+  ansible.builtin.assert:
+    that:
+      - groups.get(haproxy_api_backend_group, []) | length > 0
+    fail_msg: "Expected at least one host in '{{ haproxy_api_backend_group }}' for HAProxy API backend."
+
+- name: Determine netcat package name
+  ansible.builtin.set_fact:
+    haproxy_nc_package: "{{ haproxy_nc_package_by_os_family[ansible_os_family] | default(haproxy_nc_package_default) }}"
+
+- name: Ensure HAProxy and netcat are installed on SUSE hosts
+  community.general.zypper:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  register: haproxy_api_package_install
+  loop:
+    - haproxy
+    - "{{ haproxy_nc_package }}"
+  when: ansible_pkg_mgr == "zypper"
+
+- name: Ensure HAProxy and netcat are installed on non-SUSE hosts
+  ansible.builtin.package:
+    name:
+      - haproxy
+      - "{{ haproxy_nc_package }}"
+    state: present
+  register: haproxy_api_package_install
+  when: ansible_pkg_mgr != "zypper"
+
+- name: Reboot SUSE host after transactional package changes
+  ansible.builtin.reboot:
+    reboot_timeout: 900
+    msg: "Reboot required to activate transactional package changes for HAProxy."
+  when:
+    - ansible_pkg_mgr == "zypper"
+    - haproxy_api_reboot_after_suse_package_changes
+    - haproxy_api_package_install is changed
+
+- name: Check existing HAProxy config locations
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ haproxy_api_config_path_candidates }}"
+  register: haproxy_api_config_path_stats
+
+- name: Select HAProxy config destination path
+  ansible.builtin.set_fact:
+    haproxy_api_effective_config_path: >-
+      {{
+        haproxy_api_config_path
+        if (haproxy_api_config_path | length > 0)
+        else (
+          haproxy_api_config_path_stats.results
+          | selectattr('stat.exists')
+          | map(attribute='stat.path')
+          | first
+          | default(haproxy_api_config_path_candidates[0])
+        )
+      }}
+
+- name: Ensure HAProxy config directory exists
+  ansible.builtin.file:
+    path: "{{ haproxy_api_effective_config_path | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Render HAProxy API load balancer configuration
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_api_effective_config_path }}"
+    mode: "0644"
+  notify: Restart haproxy
+
+- name: Allow HAProxy to bind API port in SELinux
+  community.general.seport:
+    ports:
+      - "{{ haproxy_api_frontend_port }}"
+    proto: tcp
+    setype: "{{ haproxy_api_selinux_port_type }}"
+    state: present
+  when:
+    - haproxy_api_manage_selinux_port
+    - ansible_selinux is defined
+    - ansible_selinux.status == "enabled"
+
+- name: Ensure haproxy is enabled and running
+  ansible.builtin.service:
+    name: haproxy
+    state: started
+    enabled: true
+
+- name: Apply pending haproxy restart before backend reconciliation
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for HAProxy admin socket
+  ansible.builtin.wait_for:
+    path: "{{ haproxy_api_stats_socket }}"
+    state: present
+    timeout: 30
+
+- name: Ensure HAProxy service is active
+  ansible.builtin.command: systemctl is-active haproxy
+  register: haproxy_api_service_state
+  changed_when: false
+  failed_when: haproxy_api_service_state.stdout | trim != "active"
+
+- name: Wait for HAProxy admin socket to accept commands
+  ansible.builtin.shell: "printf 'show info\\n' | nc -U {{ haproxy_api_stats_socket }} >/dev/null"
+  register: haproxy_api_socket_probe
+  changed_when: false
+  retries: 15
+  delay: 2
+  until: haproxy_api_socket_probe.rc == 0
+
+- name: Ensure control-plane backends are enabled in HAProxy runtime
+  community.general.haproxy:
+    state: enabled
+    backend: "{{ haproxy_api_backend_name }}"
+    host: "{{ item }}"
+    socket: "{{ haproxy_api_stats_socket }}"
+    fail_on_not_found: true
+    wait: true
+  loop: "{{ groups[haproxy_api_backend_group] }}"
+  loop_control:
+    label: "{{ item }}"

@@ -1,0 +1,7 @@
+---
+- name: Install and configure HAProxy for RKE2 API load balancing
+  hosts: k8s_api_lb
+  become: true
+  gather_facts: true
+  roles:
+    - haproxy_api_lb

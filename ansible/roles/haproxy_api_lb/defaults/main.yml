@@ -1,0 +1,25 @@
+---
+haproxy_api_frontend_bind_address: "{{ ansible_default_ipv4.address }}"
+haproxy_api_frontend_port: 6443
+haproxy_api_backend_group: "k8s_control_plane"
+haproxy_api_backend_name: "rke2_api_servers"
+haproxy_api_backend_port: 6443
+haproxy_api_config_path: ""
+haproxy_api_config_path_candidates:
+  - /etc/haproxy/haproxy.cfg
+  - /etc/haproxy.cfg
+haproxy_api_balance_algorithm: "roundrobin"
+haproxy_api_connect_timeout: "10s"
+haproxy_api_client_timeout: "1m"
+haproxy_api_server_timeout: "1m"
+haproxy_api_stats_socket: "/var/run/haproxy.sock"
+haproxy_api_reboot_after_suse_package_changes: true
+haproxy_api_manage_selinux_port: true
+haproxy_api_selinux_port_type: "http_port_t"
+
+haproxy_nc_package_default: "netcat"
+haproxy_nc_package_by_os_family:
+  Debian: netcat-openbsd
+  RedHat: nmap-ncat
+  Suse: netcat-openbsd
+  Alpine: netcat-openbsd
