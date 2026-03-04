@@ -6,75 +6,80 @@ snippets_datastore_id = "local"
 vm_datastore_id       = "local-lvm"
 bridge                = "vmbr0"
 
+# Default image for nodes (used unless a node sets image_import_from)
 # Manually prepared openSUSE Leap Micro 6.2 image in local import storage
 base_image_import_from = "local:import/openSUSE-Leap-Micro.x86_64-Default-qcow.qcow2"
 
 nodes = {
   haproxy = {
-    vm_id     = 190
-    hostname  = "k8s-lb-01"
-    cores     = 2
-    memory_mb = 2048
-    tags      = ["k8s", "lb"]
-    disk_gb   = 32
-    ipv4_cidr    = "192.168.2.45/24"
-    ipv4_gateway = "192.168.2.254"
+    vm_id              = 190
+    hostname           = "k8s-lb-01"
+    cores              = 2
+    memory_mb          = 2048
+    tags               = ["k8s", "lb"]
+    disk_gb            = 32
+    cloud_init_profile = "suse_leap_16"
+    # Override the default image for this mutable VM.
+    # Update the file name below to match your uploaded Leap 16 qcow2 exactly.
+    image_import_from = "local:import/Leap-16.0-Minimal-VM.x86_64-kvm-and-xen.qcow2"
+    ipv4_cidr         = "192.168.2.45/24"
+    ipv4_gateway      = "192.168.2.254"
 
     # user_data_file_name = "k8s-lb-01-userdata.yaml"
   }
   cp1 = {
-    vm_id     = 201
-    hostname  = "k8s-cp-01"
-    cores     = 2
-    memory_mb = 4096
-    tags      = ["k8s", "cp"]
-    disk_gb   = 32
+    vm_id        = 201
+    hostname     = "k8s-cp-01"
+    cores        = 2
+    memory_mb    = 4096
+    tags         = ["k8s", "cp"]
+    disk_gb      = 32
     ipv4_cidr    = "192.168.2.50/24"
     ipv4_gateway = "192.168.2.254"
 
     # user_data_file_name = "k8s-cp-01-userdata.yaml"
   }
   cp2 = {
-    vm_id     = 202
-    hostname  = "k8s-cp-02"
-    cores     = 2
-    memory_mb = 4096
-    tags      = ["k8s", "cp"]
-    disk_gb   = 32
+    vm_id        = 202
+    hostname     = "k8s-cp-02"
+    cores        = 2
+    memory_mb    = 4096
+    tags         = ["k8s", "cp"]
+    disk_gb      = 32
     ipv4_cidr    = "192.168.2.51/24"
     ipv4_gateway = "192.168.2.254"
 
     # user_data_file_name = "k8s-cp-02-userdata.yaml"
   }
   cp3 = {
-    vm_id     = 203
-    hostname  = "k8s-cp-03"
-    cores     = 2
-    memory_mb = 4096
-    tags      = ["k8s", "cp"]
-    disk_gb   = 32
+    vm_id        = 203
+    hostname     = "k8s-cp-03"
+    cores        = 2
+    memory_mb    = 4096
+    tags         = ["k8s", "cp"]
+    disk_gb      = 32
     ipv4_cidr    = "192.168.2.52/24"
     ipv4_gateway = "192.168.2.254"
 
     # user_data_file_name = "k8s-cp-03-userdata.yaml"
   }
   wkr1 = {
-    vm_id     = 211
-    hostname  = "k8s-wkr-01"
-    cores     = 4
-    memory_mb = 4096
-    tags      = ["k8s", "worker"]
+    vm_id        = 211
+    hostname     = "k8s-wkr-01"
+    cores        = 4
+    memory_mb    = 4096
+    tags         = ["k8s", "worker"]
     ipv4_cidr    = "192.168.2.53/24"
     ipv4_gateway = "192.168.2.254"
 
     # user_data_file_name = "k8s-wkr-01-userdata.yaml"
   }
   wkr2 = {
-    vm_id     = 212
-    hostname  = "k8s-wkr-02"
-    cores     = 4
-    memory_mb = 4096
-    tags      = ["k8s", "worker"]
+    vm_id        = 212
+    hostname     = "k8s-wkr-02"
+    cores        = 4
+    memory_mb    = 4096
+    tags         = ["k8s", "worker"]
     ipv4_cidr    = "192.168.2.54/24"
     ipv4_gateway = "192.168.2.254"
 

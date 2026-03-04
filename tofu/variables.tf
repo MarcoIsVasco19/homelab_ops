@@ -13,7 +13,7 @@ variable "bridge" {
 
 variable "base_image_import_from" {
   type        = string
-  description = "e.g. local:import/openSUSE-Leap-Micro.x86_64-ContainerHost-kvm-and-xen.qcow2"
+  description = "Default Proxmox import file_id used for VM disks, unless node.image_import_from is set."
 }
 
 variable "root_ssh_public_key" {
@@ -33,10 +33,22 @@ variable "nodes" {
     cores               = number
     memory_mb           = number
     disk_gb             = optional(number, 32)
+    image_import_from   = optional(string) # optional per-node image override
+    cloud_init_profile  = optional(string, "suse_leap_micro")
     tags                = optional(list(string), [])
     ipv4_cidr           = optional(string) # e.g. 192.168.2.101/24; defaults to DHCP when omitted
     ipv4_gateway        = optional(string) # e.g. 192.168.2.1; used with ipv4_cidr
     user_data_file_id   = optional(string) # deprecated: used only to derive file name
     user_data_file_name = optional(string)
   }))
+
+  validation {
+    condition = alltrue([
+      for _, node in var.nodes : contains(
+        ["suse_leap_micro", "suse_leap_16"],
+        try(node.cloud_init_profile, "suse_leap_micro")
+      )
+    ])
+    error_message = "nodes[*].cloud_init_profile must be one of: suse_leap_micro, suse_leap_16."
+  }
 }

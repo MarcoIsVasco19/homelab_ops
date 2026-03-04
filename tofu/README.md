@@ -39,6 +39,8 @@ tofu apply
 - Cloud-init snippets are rendered/uploaded by OpenTofu per-node during apply.
 - Node networking defaults to DHCP. Set `ipv4_cidr` (and usually `ipv4_gateway`) per node in `nodes.auto.tfvars` to use static IPs.
 - `disk_gb` defaults to `32` when omitted.
+- `base_image_import_from` is the global default image, and each node can override it with `image_import_from`.
+- `cloud_init_profile` defaults to `suse_leap_micro`; set `suse_leap_16` for Leap 16 nodes.
 
 ## Environment variables
 

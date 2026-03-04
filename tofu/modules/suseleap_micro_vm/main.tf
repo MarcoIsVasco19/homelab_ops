@@ -46,8 +46,8 @@ resource "proxmox_virtual_environment_vm" "vm" {
     ssd          = true
     size         = each.value.disk_gb
 
-    # Use your manually prepared base image (import content)
-    import_from = var.base_image_import_from
+    # Allow per-node image override while keeping a global default.
+    import_from = coalesce(try(each.value.image_import_from, null), var.base_image_import_from)
   }
 
   # Cloud-init userdata is uploaded by OpenTofu to snippets datastore.
