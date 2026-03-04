@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Amsterdam",
+  "enabledManagers": [
+    "terraform",
+    "regex"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^ansible/inventory/group_vars/all\\.yml$"
+      ],
+      "matchStrings": [
+        "rke2_version:\\s*\"(?<currentValue>v?\\d+\\.\\d+\\.\\d+\\+rke2r\\d+)\""
+      ],
+      "depNameTemplate": "rancher/rke2",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "regex:^v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\+rke2r(?<build>\\d+)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "regex"
+      ],
+      "matchDepNames": [
+        "rancher/rke2"
+      ],
+      "groupName": "rke2 kubernetes version",
+      "labels": [
+        "dependencies",
+        "kubernetes",
+        "rke2"
+      ],
+      "automerge": false
+    }
+  ]
+}
